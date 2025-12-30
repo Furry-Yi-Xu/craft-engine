@@ -23,19 +23,26 @@ subprojects {
     tasks.processResources {
         filteringCharset = "UTF-8"
 
-        filesMatching(arrayListOf("craft-engine.properties")) {
+        // craft-engine.properties 占位符
+        filesMatching("craft-engine.properties") {
             expand(rootProject.properties)
         }
 
-        filesMatching(arrayListOf("commands.yml", "config.yml")) {
+        // commands.yml 和 config.yml 占位符，增加默认值防止 CI 崩溃
+        val projectVersion = rootProject.properties["project_version"] ?: "0.0.1"
+        val configVersion = rootProject.properties["config_version"] ?: "0.0.1"
+        val langVersion = rootProject.properties["lang_version"] ?: "0.0.1"
+
+        filesMatching(listOf("commands.yml", "config.yml")) {
             expand(
-                Pair("project_version", rootProject.properties["project_version"]!!),
-                Pair("config_version", rootProject.properties["config_version"]!!),
-                Pair("lang_version", rootProject.properties["lang_version"]!!)
+                "project_version" to projectVersion,
+                "config_version" to configVersion,
+                "lang_version" to langVersion
             )
         }
     }
 }
+
 
 fun versionBanner(): String {
     return System.getenv("GIT_COMMIT") 
