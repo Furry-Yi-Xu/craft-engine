@@ -37,18 +37,25 @@ subprojects {
     }
 }
 
-fun versionBanner(): String = try {
-    project.providers.exec {
-        commandLine("git", "rev-parse", "--short=8", "HEAD")
-    }.standardOutput.asText.get().trim()
-} catch (e: Exception) {
-    "Unknown"
+fun versionBanner(): String {
+    return System.getenv("GIT_COMMIT") 
+        ?: try {
+            project.providers.exec {
+                commandLine("git", "rev-parse", "--short=8", "HEAD")
+            }.standardOutput.asText.get().trim()
+        } catch (e: Exception) {
+            "Unknown"
+        }
 }
 
-fun builder(): String = try {
-    project.providers.exec {
-        commandLine("git", "config", "user.name")
-    }.standardOutput.asText.get().trim()
-} catch (e: Exception) {
-    "Unknown"
+fun builder(): String {
+    return System.getenv("GIT_BUILDER")
+        ?: try {
+            project.providers.exec {
+                commandLine("git", "config", "user.name")
+            }.standardOutput.asText.get().trim()
+        } catch (e: Exception) {
+            "Unknown"
+        }
 }
+
